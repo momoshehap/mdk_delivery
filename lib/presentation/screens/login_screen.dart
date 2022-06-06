@@ -1,7 +1,9 @@
+import 'package:MDKDelivery/business_logic/cubit/api_cubit/api_Cubit.dart';
+import 'package:MDKDelivery/business_logic/cubit/api_cubit/api_states.dart';
+import 'package:MDKDelivery/presentation/widgets/login_componants.dart';
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
-import 'package:email_validator/email_validator.dart';
-
-import '../../utils/strings.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -55,6 +57,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                     },
                     maxLines: 1,
+                              keyboardType: TextInputType.number,
+
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24.0),
@@ -80,6 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     maxLines: 1,
                     obscureText: _isObscure,
+                              keyboardType: TextInputType.number,
+
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24.0),
@@ -105,24 +111,47 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24.0),
-                      ),
-                      primary: Color(0xff155079),
-                      minimumSize: const Size.fromHeight(55), // NEW
-                    ),
-                    onPressed: () {
-                      if (formKey.currentState!.validate()) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            appMainScreen, (Route<dynamic> route) => false);
+                  BlocConsumer<ApiAppCubit, ApiStates>(
+                    listener: (context, state) {
+                      if (state is GetwrongAccountState) {
+                        buildWrongAccountDialog(context);
+                      }
+                      if (state is GetLoginDataErorrState) {
+                        buildCheckInternetAlert(context);
                       }
                     },
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(fontSize: 20),
-                    ),
+                    builder: (context, state) {
+                      var cubit = ApiAppCubit.get(context);
+                      return ConditionalBuilder(
+                        condition: state is! NewLoginLoadingState,
+                        builder: (context) => ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            primary: Color(0xff155079),
+                            minimumSize: const Size.fromHeight(55), // NEW
+                          ),
+                          onPressed: () async {
+                            if (formKey.currentState!.validate()) {
+                              await cubit.getLoginData(
+                                context: context,
+                                number: usernameController.text.toString(),
+                                password: passwordController.text.toString(),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                        fallback: (context) => const Center(
+                            child: CircularProgressIndicator(
+                          color: Color(0xff155079),
+                        )),
+                      );
+                    },
                   ),
                 ],
               ),

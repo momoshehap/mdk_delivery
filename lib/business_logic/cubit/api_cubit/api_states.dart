@@ -2,20 +2,80 @@ abstract class ApiStates {}
 
 class InitApiappState extends ApiStates {}
 
-class NewsBusinessLoadingState extends ApiStates {}
+class NewLoginLoadingState extends ApiStates {}
 
-class GetBusinessDataSuccessState extends ApiStates {}
+class GetLoginDataSuccessState extends ApiStates {}
 
-class GetBusinessDataErorrState extends ApiStates {
+class GetLoginDataErorrState extends ApiStates {
   final String error;
-  GetBusinessDataErorrState(this.error);
+  GetLoginDataErorrState(this.error);
 }
 
-class ApiSearchLoadingState extends ApiStates {}
+class GetwrongAccountState extends ApiStates {}
 
-class GetSearcheDataSuccessState extends ApiStates {}
+class NewLoadingDataState extends ApiStates {}
 
-class GetSearchDataErorrState extends ApiStates {
+class GetShiftTimeSuccessState extends ApiStates {}
+
+class GetShiftTimeErorrState extends ApiStates {
   final String error;
-  GetSearchDataErorrState(this.error);
+  GetShiftTimeErorrState(this.error);
+}
+
+class NewLoadingpickUpDataState extends ApiStates {}
+
+class GetPickUpDataSuccessState extends ApiStates {}
+
+class GetPickUpDataErorrState extends ApiStates {
+  final String error;
+  GetPickUpDataErorrState(this.error);
+}
+
+class NewLoadingDropOffDataState extends ApiStates {}
+
+class GetDropOffDataSuccessState extends ApiStates {}
+
+class GetDropOffDataErorrState extends ApiStates {
+  final String error;
+  GetDropOffDataErorrState(this.error);
+}
+
+class NewLoadingCustomersDataState extends ApiStates {}
+
+class GetCustomerDataSuccessState extends ApiStates {}
+
+class GetCustomerDataErorrState extends ApiStates {
+  final String error;
+  GetCustomerDataErorrState(this.error);
+}
+
+class NewLoadingShearchCustomersDataState extends ApiStates {}
+
+class GetSearchedCustomerDataSuccessState extends ApiStates {}
+
+class GetSearchedCustomerDataErorrState extends ApiStates {
+  final String error;
+  GetSearchedCustomerDataErorrState(this.error);
+}
+
+class NewLoadingupDAteGpsCustomerState extends ApiStates {}
+
+class upDAteGpsCustomerSuccessState extends ApiStates {}
+
+class upDAteGpsCustomerErorrState extends ApiStates {
+  final String error;
+  upDAteGpsCustomerErorrState(this.error);
+}
+
+class NewLoadinggetCurrentLocationState extends ApiStates {}
+
+class getCurrentLocationSuccessState extends ApiStates {}
+
+class NewLoadingNotificationsDataState extends ApiStates {}
+
+class GetNotificationsDataSuccessState extends ApiStates {}
+
+class GetNotificationsDataErorrState extends ApiStates {
+  final String error;
+  GetNotificationsDataErorrState(this.error);
 }

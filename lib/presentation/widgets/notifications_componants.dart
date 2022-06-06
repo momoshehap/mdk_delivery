@@ -1,15 +1,15 @@
-import 'package:flutter/cupertino.dart';
+import 'package:MDKDelivery/model/notify_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:MDKDelivery/business_logic/cubit/order_cubit/order_cubit.dart';
 import 'package:MDKDelivery/business_logic/cubit/order_cubit/order_state.dart';
 
-Widget buildNotifyCard() {
+Widget buildNotifyCard(Data notification) {
   return BlocBuilder<OrderCubit, OrderStates>(builder: (context, state) {
     var cubit = OrderCubit.get(context);
     return InkWell(
       onTap: () {
-        cubit.showClickedNotify();
+        cubit.showClickedNotify(active: notification);
       },
       child: Row(
         children: [
@@ -17,7 +17,7 @@ Widget buildNotifyCard() {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Contact changed his number",
+                notification.title,
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: "SegoeUI",
@@ -31,7 +31,7 @@ Widget buildNotifyCard() {
                 height: 3,
               ),
               Text(
-                "2021-03-22 12:30:44",
+                notification.insertdatetime,
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: "SegoeUI",
@@ -45,7 +45,7 @@ Widget buildNotifyCard() {
           Spacer(),
           IconButton(
             onPressed: () {
-              cubit.showClickedNotify();
+              cubit.showClickedNotify(active: notification);
             },
             icon: Icon(Icons.arrow_forward_ios),
           ),
@@ -79,7 +79,7 @@ Widget notificationBody() {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Contact changed his number",
+                      cubit.activeNotification!.title,
                       style: TextStyle(
                         fontSize: 18,
                         fontFamily: "SegoeUI",
@@ -93,7 +93,7 @@ Widget notificationBody() {
                       height: 3,
                     ),
                     Text(
-                      "2021-03-22 12:30:44",
+                      cubit.activeNotification!.insertdatetime,
                       style: TextStyle(
                         fontSize: 18,
                         fontFamily: "SegoeUI",
@@ -109,7 +109,7 @@ Widget notificationBody() {
                 height: 30,
               ),
               Text(
-                "body Contact changed his number Contact changed his number Contact changed his number",
+                cubit.activeNotification!.description,
                 style: TextStyle(
                   fontSize: 18,
                   fontFamily: "SegoeUI",

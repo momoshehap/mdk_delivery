@@ -6,6 +6,7 @@ import 'package:MDKDelivery/presentation/screens/login_screen.dart';
 import 'package:MDKDelivery/presentation/screens/notification_screen.dart';
 import 'package:MDKDelivery/presentation/screens/settings_screen.dart';
 
+import '../main.dart';
 import '../utils/strings.dart';
 
 class AppRouter {
@@ -16,6 +17,10 @@ class AppRouter {
           builder: (_) => const LoginScreen(),
         );
 
+      case mainn:
+        return MaterialPageRoute(
+          builder: (_) => const MyApp(),
+        );
       case appMainScreen:
         return MaterialPageRoute(
           builder: (_) => const MainAppScreen(),

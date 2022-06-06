@@ -1,0 +1,16 @@
+{
+    "home":"Home", 
+    "update":"update",
+    "customers":"Customers",
+    "notification":"Notifications",
+    "settings":"Settings",
+    "dropoff":"Drop Off",
+    "pickup":"Pick Up",
+    "empty_order":"No Orders Availabile For Now",
+    "update_location":"Update Customer Location",
+    "search"  :"Search",
+    "change_language":"Change Language",
+    "logout":"LogOut"
+
+
+}

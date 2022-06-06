@@ -1,33 +1,18 @@
+import 'package:MDKDelivery/business_logic/cubit/api_cubit/api_Cubit.dart';
+import 'package:MDKDelivery/business_logic/cubit/api_cubit/api_states.dart';
+import 'package:MDKDelivery/localization/localizatios.dart';
+import 'package:MDKDelivery/model/order_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:MDKDelivery/business_logic/cubit/order_cubit/order_cubit.dart';
 import 'package:MDKDelivery/business_logic/cubit/order_cubit/order_state.dart';
 
-Widget buildSearchbar() {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 10.0),
-    child: SizedBox(
-      height: 48,
-      child: TextField(
-        decoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(24.0),
-          ),
-          filled: true,
-          hintText: "Search customers",
-          prefixIcon: const Icon(
-            Icons.search,
-          ),
-        ),
-      ),
-    ),
-  );
-}
+Widget buildCustomerCard(BuildContext context, Data? orders) {
+  var cubit = OrderCubit.get(context);
 
-Widget buildCustomerCard(BuildContext context) {
   return InkWell(
     onTap: () {
-      buildCustomerDialog(context);
+      buildCustomerDialog(context, orders);
     },
     child: Padding(
       padding: const EdgeInsets.all(8.0),
@@ -57,9 +42,9 @@ Widget buildCustomerCard(BuildContext context) {
             width: double.infinity,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Row(
-                children: const [
+                children: [
                   Text(
-                    "#22548",
+                    '#${orders!.orderId}',
                     style: TextStyle(
                       fontSize: 17,
                       fontFamily: "SegoeUI",
@@ -68,15 +53,12 @@ Widget buildCustomerCard(BuildContext context) {
                     ),
                   ),
                   Spacer(),
-                  ImageIcon(
-                    AssetImage("assets/icons/Collected.png"),
-                    color: Colors.green,
-                  ),
                   Text(
-                    "Collected",
+                    orders.StatusName!,
                     style: TextStyle(
-                      color: Colors.green,
+                      color: Color(0xff004067),
                       fontSize: 13,
+                      fontWeight: FontWeight.bold,
                       fontFamily: "SegoeUI",
                     ),
                   ),
@@ -88,7 +70,7 @@ Widget buildCustomerCard(BuildContext context) {
               Row(
                 children: [
                   Text(
-                    "Doctor",
+                    cubit.isAr ? orders.ArcustomerType! : orders.customerType!,
                     style: TextStyle(
                         fontSize: 15,
                         fontFamily: "SegoeUI",
@@ -104,7 +86,7 @@ Widget buildCustomerCard(BuildContext context) {
                     ),
                   ),
                   Text(
-                    "Dr. Ali Salha",
+                    orders.customerName!,
                     style: TextStyle(
                       fontSize: 15,
                       color: Color(0xffB2B1B1),
@@ -120,13 +102,14 @@ Widget buildCustomerCard(BuildContext context) {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Expanded(
                     child: Text.rich(
                       TextSpan(
                         children: <InlineSpan>[
                           TextSpan(
-                            text: 'Hamra - ',
+                            text:
+                                '${cubit.isAr ? orders.cityNameAr : orders.cityName} - ',
                             style: TextStyle(
                               fontSize: 14,
                               fontFamily: "SegoeUI",
@@ -135,8 +118,9 @@ Widget buildCustomerCard(BuildContext context) {
                             ),
                           ),
                           TextSpan(
-                            text:
-                                "Clemenceau street -Clemenceau medicalcenter-Bloc A - 15th floor - Clinic 220",
+                            text: cubit.isAr
+                                ? orders.ArAddress
+                                : orders.customerAddress,
                             style: TextStyle(
                               fontSize: 13,
                               fontFamily: "SegoeUI",
@@ -157,7 +141,9 @@ Widget buildCustomerCard(BuildContext context) {
               Row(
                 children: [
                   Text(
-                    " With collection",
+                    orders.amount != ""
+                        ? "${orders.amount} - ${orders.currency} With collection"
+                        : "",
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.green,
@@ -173,325 +159,380 @@ Widget buildCustomerCard(BuildContext context) {
   );
 }
 
-Future<dynamic> buildCustomerDialog(cnxt) {
+Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
   return showDialog(
     barrierDismissible: false,
     context: cnxt,
     builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.white.withOpacity(0.0),
-        contentPadding: const EdgeInsets.all(0.0),
-        content: SizedBox(
-          height: 450,
-          child: Stack(
-            alignment: Alignment.topRight,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Container(
-                  height: 415,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: BlocProvider(
-                      create: (context) => OrderCubit(),
-                      child: BlocBuilder<OrderCubit, OrderStates>(
-                          builder: (context, state) {
-                        var cubit = OrderCubit.get(context);
+      return BlocBuilder<ApiAppCubit, ApiStates>(
+        builder: (context, state) {
+          var apicubit = ApiAppCubit.get(context);
+          return AlertDialog(
+            backgroundColor: Colors.white.withOpacity(0.0),
+            contentPadding: const EdgeInsets.all(0.0),
+            content: SizedBox(
+              height: 550,
+              child: Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Container(
+                      height: 430,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: BlocProvider(
+                          create: (context) => OrderCubit(),
+                          child: BlocBuilder<OrderCubit, OrderStates>(
+                              builder: (context, state) {
+                            var cubit = OrderCubit.get(context);
 
-                        return SingleChildScrollView(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: const [
-                                  Text(
-                                    "#22548",
+                            return SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "#${orders!.orderId}",
+                                        style: TextStyle(
+                                          fontSize: 17,
+                                          fontFamily: "SegoeUI",
+                                          color: Color(0xff004067),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      Text(
+                                        orders.StatusName!,
+                                        style: TextStyle(
+                                          color: Color(0xff004067),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "SegoeUI",
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 2,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        cubit.isAr
+                                            ? orders.ArcustomerType!
+                                            : orders.customerType!,
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontFamily: "SegoeUI",
+                                            color: Color(0xff004067),
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          height: 15,
+                                          width: 2,
+                                          color: Color(0xff707070),
+                                        ),
+                                      ),
+                                      Text(
+                                        orders.customerName!,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Color(0xffB2B1B1),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      ImageIcon(
+                                        AssetImage("assets/icons/number.png"),
+                                        color: Color(0xff004067),
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          cubit.makingPhoneCall(
+                                              orders.customerPhone);
+                                        },
+                                        child: Text(
+                                          orders.customerPhone!,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontFamily: "SegoeUI",
+                                            color: Color(0xffB2B1B1),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 2,
+                                  ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Expanded(
+                                        child: Text.rich(
+                                          TextSpan(
+                                            children: <InlineSpan>[
+                                              TextSpan(
+                                                text: cubit.isAr
+                                                    ? orders.cityNameAr
+                                                    : orders.cityName,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontFamily: "SegoeUI",
+                                                  color: Color(0xffB2B1B1),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: cubit.isAr
+                                                    ? orders.ArAddress
+                                                    : orders.customerAddress,
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontFamily: "SegoeUI",
+                                                  color: Color(0xffB2B1B1),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 2,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        orders.amount != ""
+                                            ? "${orders.amount} - ${orders.currency} With collection"
+                                            : "",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 2,
+                                  ),
+                                  const Text(
+                                    "Notes",
                                     style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 12,
                                       fontFamily: "SegoeUI",
                                       color: Color(0xff004067),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Spacer(),
-                                  ImageIcon(
-                                    AssetImage("assets/icons/Collected.png"),
-                                    color: Colors.green,
+                                  const SizedBox(
+                                    height: 2,
                                   ),
                                   Text(
-                                    "Collected",
+                                    orders.notes!,
                                     style: TextStyle(
-                                      color: Colors.green,
-                                      fontSize: 13,
+                                      fontSize: 12,
                                       fontFamily: "SegoeUI",
+                                      color: Color(0xff004067),
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "Doctor",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: "SegoeUI",
+                                  const SizedBox(
+                                    height: 2,
+                                  ),
+                                  Row(
+                                    children: [
+                                      ImageIcon(
+                                        AssetImage("assets/icons/location.png"),
                                         color: Color(0xff004067),
-                                        fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          cubit.navigateTo(orders.customerGPS!);
+                                        },
+                                        child: Text(
+                                          "Show on map",
+                                          style: TextStyle(
+                                              fontSize: 13,
+                                              fontFamily: "SegoeUI",
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xff004067)),
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      height: 15,
-                                      width: 2,
-                                      color: Color(0xff707070),
-                                    ),
-                                  ),
-                                  Text(
-                                    "Dr. Ali Salha",
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: Color(0xffB2B1B1),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/icons/number.png"),
-                                    color: Color(0xff004067),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      cubit.makingPhoneCall("+961 1 255 863");
+                                  PopupMenuButton(
+                                    elevation: 16,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8.0))),
+                                    itemBuilder: (context) {
+                                      return [
+                                        'Picked_Up',
+                                        'Collected',
+                                        'Delivered',
+                                      ]
+                                          .map(
+                                            (value) => PopupMenuItem(
+                                              value: value,
+                                              child: Text(value),
+                                            ),
+                                          )
+                                          .toList();
                                     },
-                                    child: Text(
-                                      "+961 1 255 863",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: "SegoeUI",
-                                        color: Color(0xffB2B1B1),
+                                    onSelected: (String? value) {
+                                      cubit.changeDropDown(value);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.brown),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              cubit.dropDownValue,
+                                              style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontFamily: "SegoeUI",
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xff004067)),
+                                            ),
+                                            Icon(Icons
+                                                .keyboard_arrow_down_sharp),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Expanded(
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: <InlineSpan>[
-                                          TextSpan(
-                                            text: 'Hamra - ',
+                                  SizedBox(
+                                    height: 8,
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      apicubit
+                                          .getCurrentLocation()
+                                          .then((value) {
+                                        print(value.longitude);
+                                        apicubit.upDAteGpsCustomer(
+                                          context,
+                                          customerId: orders.customerId!,
+                                          latlunGps:
+                                              "${value.latitude},${value.longitude}",
+                                          token: apicubit
+                                              .user!.response.data.token,
+                                        );
+                                      });
+                                    },
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.all(7),
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(50.0),
+                                        color: const Color(0xff155079),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            getLang(cnxt, "update_location"),
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontFamily: "SegoeUI",
-                                              color: Color(0xffB2B1B1),
                                               fontWeight: FontWeight.bold,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                          TextSpan(
-                                            text:
-                                                "Clemenceau street -Clemenceau medicalcenter-Bloc A - 15th floor - Clinic 220",
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontFamily: "SegoeUI",
-                                              color: Color(0xffB2B1B1),
-                                            ),
-                                          )
+                                          Spacer(),
+                                          Icon(
+                                            Icons.add_location_alt_outlined,
+                                            color: Colors.white,
+                                          ),
                                         ],
                                       ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "Pick up ",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontFamily: "SegoeUI",
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    " With collection",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              const Text(
-                                "Notes",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontFamily: "SegoeUI",
-                                  color: Color(0xff004067),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              Text(
-                                "please leave the packages at the reciption with mrs . Nayla Saade",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontFamily: "SegoeUI",
-                                  color: Color(0xff004067),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  InkWell(
-                                    onTap: () {},
-                                    child: Image.asset("assets/icons/mic.png"),
-                                  ),
-                                  InkWell(
-                                    onTap: () {},
-                                    child: Image.asset(
-                                      "assets/icons/play_voice.png",
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/icons/location.png"),
-                                    color: Color(0xff004067),
                                   ),
                                   SizedBox(
-                                    width: 5,
+                                    height: 8,
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      cubit.navigateTo(-3.823216, -38.481700);
-                                    },
-                                    child: Text("Show on map"),
-                                  )
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        apicubit
+                                            .updateOrderStatus(cnxt,
+                                                orderId: orders.orderId!,
+                                                status: cubit.dropDownValue)
+                                            .then((value) {
+                                          apicubit.getpickUpOrders();
+                                          apicubit.getDropOffOrders();
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        getLang(cnxt, "update"),
+                                        style: TextStyle(
+                                          fontSize: 17,
+                                          fontFamily: "SegoeUI",
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        shape: StadiumBorder(),
+                                        primary: Color(0xff0D4B75),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
-                              PopupMenuButton(
-                                elevation: 16,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8.0))),
-                                itemBuilder: (context) {
-                                  return [
-                                    'Pinding',
-                                    'Picked up',
-                                    'collected',
-                                    'Delivered',
-                                  ]
-                                      .map(
-                                        (value) => PopupMenuItem(
-                                          value: value,
-                                          child: Text(value),
-                                        ),
-                                      )
-                                      .toList();
-                                },
-                                onSelected: (String? value) {
-                                  cubit.changeDropDown(value);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.brown),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(20))),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          cubit.dropDownValue,
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontFamily: "SegoeUI",
-                                            color: Color(0xff004067),
-                                          ),
-                                        ),
-                                        Icon(Icons.keyboard_arrow_down_sharp),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {},
-                                  child: Text(
-                                    'Update',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      fontFamily: "SegoeUI",
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    shape: StadiumBorder(),
-                                    primary: Color(0xff0D4B75),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
+                            );
+                          }),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Positioned(
+                        top: 0, child: Image.asset("assets/icons/dismiss.png")),
+                  ),
+                ],
               ),
-              InkWell(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: Positioned(
-                    top: 0, child: Image.asset("assets/icons/dismiss.png")),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       );
     },
   );

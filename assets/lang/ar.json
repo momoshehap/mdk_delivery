@@ -1,0 +1,17 @@
+{
+    "home":"الرئيسية", 
+    "update":"تحديث",
+    "customers":"الزبائن",
+    "notification":"الاشعارات",
+    "settings":"الاعدادات",
+    "dropoff":" توصيل الى",
+    "pickup":" جمع من",
+    "empty_order":"لا يوجد طلبات حتى الان",
+    "update_location":"تحديث موقع العميل",
+    "search"  :"بحث",
+    "change_language":"تغير اللغه",
+    "logout":"تسجيل الخروج"
+
+
+
+}

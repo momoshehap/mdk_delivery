@@ -60,11 +60,20 @@ class GetSearchedCustomerDataErorrState extends ApiStates {
 
 class NewLoadingupDAteGpsCustomerState extends ApiStates {}
 
-class upDAteGpsCustomerSuccessState extends ApiStates {}
+class UpDAteGpsCustomerSuccessState extends ApiStates {}
 
-class upDAteGpsCustomerErorrState extends ApiStates {
+class UpDAteGpsCustomerErorrState extends ApiStates {
   final String error;
-  upDAteGpsCustomerErorrState(this.error);
+  UpDAteGpsCustomerErorrState(this.error);
+}
+
+class NewLoadingupDateOrderStatusState extends ApiStates {}
+
+class UpDateOrderStatusSuccessState extends ApiStates {}
+
+class UpDateOrderStatusErorrState extends ApiStates {
+  final String error;
+  UpDateOrderStatusErorrState(this.error);
 }
 
 class NewLoadinggetCurrentLocationState extends ApiStates {}

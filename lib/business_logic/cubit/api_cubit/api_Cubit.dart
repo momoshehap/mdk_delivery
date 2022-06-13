@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:MDKDelivery/localization/localizatios.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:MDKDelivery/model/customer_model.dart';
 import 'package:MDKDelivery/model/notify_model.dart';
@@ -6,7 +7,6 @@ import 'package:MDKDelivery/model/order_model.dart';
 import 'package:MDKDelivery/model/shiftTime_model.dart';
 import 'package:MDKDelivery/model/user_model.dart';
 import 'package:MDKDelivery/service/api.dart';
-import 'package:MDKDelivery/utils/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -60,8 +60,6 @@ class ApiAppCubit extends Cubit<ApiStates> {
         userPrefs.setString(
             'userData', jsonEncode(ApiAppCubit.get(context).user!.toJson()));
         isLogin = true;
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            appMainScreen, (Route<dynamic> route) => false);
       }
     }).catchError((e) {
       print(e);
@@ -240,17 +238,18 @@ class ApiAppCubit extends Cubit<ApiStates> {
       header: token,
     ).then((value) {
       print(value.data['response']['msg']);
-      emit(upDAteGpsCustomerSuccessState());
+      emit(UpDAteGpsCustomerSuccessState());
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: const Color(0xff155079),
         content: Text("Gps Location Updated Successfuly"),
       ));
     }).catchError((e) {
+      emit(UpDAteGpsCustomerErorrState(e.toString()));
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: const Color(0xff155079),
         content: Text("Please check your Internet"),
       ));
-      emit(upDAteGpsCustomerErorrState(e.toString()));
     });
   }
 
@@ -274,8 +273,7 @@ class ApiAppCubit extends Cubit<ApiStates> {
     required String orderId,
     required String status,
   }) async {
-    emit(NewLoadingupDAteGpsCustomerState());
-
+    emit(NewLoadingupDateOrderStatusState());
     Helper.SendPost(
       url: updateOrderPath,
       query: {
@@ -287,17 +285,16 @@ class ApiAppCubit extends Cubit<ApiStates> {
     ).then((value) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: const Color(0xff155079),
-        content: Text("Order Status Updated Successfuly"),
+        content: Text(getLang(context, "orderupDate")),
       ));
-      print(value.data['response']['response']);
 
-      emit(upDAteGpsCustomerSuccessState());
+      emit(UpDateOrderStatusSuccessState());
     }).catchError((e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.red,
-        content: Text("Please check your Internet"),
+        content: Text(getLang(context, "checkinternet")),
       ));
-      emit(upDAteGpsCustomerErorrState(e.toString()));
+      emit(UpDateOrderStatusErorrState(e.toString()));
     });
   }
 }

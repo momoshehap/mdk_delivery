@@ -71,7 +71,7 @@ class Data {
   late final String? voiceNote;
   late final String? cityName;
   late final String? cityNameAr;
-  late final String? StatusName;
+  late String? StatusName;
 
   Data.fromJson(Map<String, dynamic> json) {
     customerId = json['customerId'];

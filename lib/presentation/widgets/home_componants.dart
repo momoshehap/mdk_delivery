@@ -6,13 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:MDKDelivery/business_logic/cubit/order_cubit/order_cubit.dart';
 import 'package:MDKDelivery/business_logic/cubit/order_cubit/order_state.dart';
+import 'package:flutter_svg/svg.dart';
 
-Widget buildCustomerCard(BuildContext context, Data? orders) {
+Widget buildCustomerCard(
+    BuildContext context, Data? orders, int index, bool type) {
   var cubit = OrderCubit.get(context);
 
   return InkWell(
     onTap: () {
-      buildCustomerDialog(context, orders);
+      buildCustomerDialog(context, orders, index, type);
     },
     child: Padding(
       padding: const EdgeInsets.all(8.0),
@@ -159,13 +161,17 @@ Widget buildCustomerCard(BuildContext context, Data? orders) {
   );
 }
 
-Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
+Future<dynamic> buildCustomerDialog(
+    cnxt, Data? orders, int index, bool isDrop) {
+  String? temp = orders!.StatusName;
+
   return showDialog(
     barrierDismissible: false,
     context: cnxt,
     builder: (BuildContext context) {
       return BlocBuilder<ApiAppCubit, ApiStates>(
-        builder: (context, state) {
+        builder: (context, apistate) {
+          print("from api $apistate");
           var apicubit = ApiAppCubit.get(context);
           return AlertDialog(
             backgroundColor: Colors.white.withOpacity(0.0),
@@ -190,8 +196,10 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                           create: (context) => OrderCubit(),
                           child: BlocBuilder<OrderCubit, OrderStates>(
                               builder: (context, state) {
-                            var cubit = OrderCubit.get(context);
+                            print("from order $state");
+                            OrderCubit.get(context).changeDropDown(temp);
 
+                            var cubit = OrderCubit.get(context);
                             return SingleChildScrollView(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -200,7 +208,7 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                   Row(
                                     children: [
                                       Text(
-                                        "#${orders!.orderId}",
+                                        "#${orders.orderId}",
                                         style: TextStyle(
                                           fontSize: 17,
                                           fontFamily: "SegoeUI",
@@ -254,8 +262,8 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                   ),
                                   Row(
                                     children: [
-                                      ImageIcon(
-                                        AssetImage("assets/icons/number.png"),
+                                      SvgPicture.asset(
+                                        "assets/icons/number.svg",
                                         color: Color(0xff004067),
                                       ),
                                       SizedBox(
@@ -337,8 +345,8 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                   const SizedBox(
                                     height: 2,
                                   ),
-                                  const Text(
-                                    "Notes",
+                                  Text(
+                                    getLang(context, "note"),
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontFamily: "SegoeUI",
@@ -363,8 +371,8 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                   ),
                                   Row(
                                     children: [
-                                      ImageIcon(
-                                        AssetImage("assets/icons/location.png"),
+                                      SvgPicture.asset(
+                                        "assets/icons/location.svg",
                                         color: Color(0xff004067),
                                       ),
                                       SizedBox(
@@ -375,7 +383,7 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                           cubit.navigateTo(orders.customerGPS!);
                                         },
                                         child: Text(
-                                          "Show on map",
+                                          getLang(context, "showonmap"),
                                           style: TextStyle(
                                               fontSize: 13,
                                               fontFamily: "SegoeUI",
@@ -406,6 +414,7 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                     },
                                     onSelected: (String? value) {
                                       cubit.changeDropDown(value);
+                                      temp = value;
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -420,7 +429,7 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              cubit.dropDownValue,
+                                              cubit.dropDownValue!,
                                               style: TextStyle(
                                                   fontSize: 13,
                                                   fontFamily: "SegoeUI",
@@ -444,7 +453,7 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                           .then((value) {
                                         print(value.longitude);
                                         apicubit.upDAteGpsCustomer(
-                                          context,
+                                          cnxt,
                                           customerId: orders.customerId!,
                                           latlunGps:
                                               "${value.latitude},${value.longitude}",
@@ -452,6 +461,8 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                               .user!.response.data.token,
                                         );
                                       });
+
+                                      Navigator.pop(context);
                                     },
                                     child: Container(
                                       width: double.infinity,
@@ -488,14 +499,17 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                                     width: double.infinity,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        apicubit
-                                            .updateOrderStatus(cnxt,
-                                                orderId: orders.orderId!,
-                                                status: cubit.dropDownValue)
-                                            .then((value) {
-                                          apicubit.getpickUpOrders();
-                                          apicubit.getDropOffOrders();
-                                        });
+                                        apicubit.updateOrderStatus(cnxt,
+                                            orderId: orders.orderId!,
+                                            status: cubit.dropDownValue!);
+
+                                        isDrop
+                                            ? apicubit.dropOffData!.response
+                                                    .data![index].StatusName =
+                                                cubit.dropDownValue!
+                                            : apicubit.pickUpData!.response
+                                                    .data![index].StatusName =
+                                                cubit.dropDownValue!;
                                         Navigator.pop(context);
                                       },
                                       child: Text(
@@ -521,13 +535,13 @@ Future<dynamic> buildCustomerDialog(cnxt, Data? orders) {
                       ),
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Positioned(
-                        top: 0, child: Image.asset("assets/icons/dismiss.png")),
-                  ),
+                  Positioned(
+                      top: 0,
+                      child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: SvgPicture.asset("assets/icons/dismiss.svg"))),
                 ],
               ),
             ),

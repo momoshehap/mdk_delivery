@@ -2,6 +2,7 @@
     "home":"Home", 
     "update":"update",
     "customers":"Customers",
+    "profile":"Profile",
     "notification":"Notifications",
     "settings":"Settings",
     "dropoff":"Drop Off",
@@ -10,7 +11,11 @@
     "update_location":"Update Customer Location",
     "search"  :"Search",
     "change_language":"Change Language",
-    "logout":"LogOut"
+    "showonmap":"Show on map",
+    "note":"Notes",
+    "logout":"LogOut",
+    "orderupDate":"Order Status Updated Successfuly",
+    "checkinternet":"some thing went wrong ,Please check your Internet"
 
 
 }

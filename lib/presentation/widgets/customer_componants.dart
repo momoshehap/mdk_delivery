@@ -7,6 +7,7 @@ import 'package:MDKDelivery/model/customer_model.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 Widget buildSearchbar(context) {
   return BlocListener<ApiAppCubit, ApiStates>(
@@ -109,9 +110,7 @@ Widget buildCustomerCard(Data customer, String token) {
                           onTap: () {
                             cubit.navigateTo(customer.customerGPS);
                           },
-                          child: ImageIcon(
-                            AssetImage("assets/icons/location.png"),
-                          ),
+                          child: SvgPicture.asset("assets/icons/location.svg"),
                         )
                       ],
                     ),
@@ -120,8 +119,8 @@ Widget buildCustomerCard(Data customer, String token) {
                     ),
                     Row(
                       children: [
-                        ImageIcon(
-                          AssetImage("assets/icons/number.png"),
+                        SvgPicture.asset(
+                          "assets/icons/number.svg",
                           color: Color(0xff004067),
                         ),
                         SizedBox(

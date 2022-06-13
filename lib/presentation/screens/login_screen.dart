@@ -1,9 +1,11 @@
 import 'package:MDKDelivery/business_logic/cubit/api_cubit/api_Cubit.dart';
 import 'package:MDKDelivery/business_logic/cubit/api_cubit/api_states.dart';
 import 'package:MDKDelivery/presentation/widgets/login_componants.dart';
+import 'package:MDKDelivery/utils/strings.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -22,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isObscure = true;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext contextt) {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -33,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset("assets/icons/logoDarkLogin.png"),
+                  SvgPicture.asset("assets/icons/logoDark.svg"),
                   const SizedBox(
                     height: 80,
                   ),
@@ -57,8 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                     },
                     maxLines: 1,
-                              keyboardType: TextInputType.number,
-
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24.0),
@@ -84,8 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     maxLines: 1,
                     obscureText: _isObscure,
-                              keyboardType: TextInputType.number,
-
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24.0),
@@ -113,6 +113,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   BlocConsumer<ApiAppCubit, ApiStates>(
                     listener: (context, state) {
+                      if (state is GetLoginDataSuccessState) {
+                        Navigator.of(context).pushReplacementNamed(
+                          appMainScreen,
+                        );
+                      }
                       if (state is GetwrongAccountState) {
                         buildWrongAccountDialog(context);
                       }
@@ -135,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () async {
                             if (formKey.currentState!.validate()) {
                               await cubit.getLoginData(
-                                context: context,
+                                context: contextt,
                                 number: usernameController.text.toString(),
                                 password: passwordController.text.toString(),
                               );
@@ -152,6 +157,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         )),
                       );
                     },
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Text(
+                    "V 2.3",
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontFamily: "SegoeUI",
+                      color: Color(0xff004067),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),

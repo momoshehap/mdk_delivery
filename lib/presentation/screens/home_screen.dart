@@ -1,9 +1,12 @@
 import 'package:MDKDelivery/business_logic/cubit/api_cubit/api_Cubit.dart';
 import 'package:MDKDelivery/business_logic/cubit/api_cubit/api_states.dart';
+import 'package:MDKDelivery/business_logic/cubit/navigation_cubit/home_navigation_cubit.dart';
 import 'package:MDKDelivery/business_logic/cubit/order_cubit/order_cubit.dart';
 import 'package:MDKDelivery/localization/localizatios.dart';
+import 'package:MDKDelivery/utils/strings.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:MDKDelivery/business_logic/cubit/order_cubit/order_state.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,19 +22,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext contextt) {
+    ApiAppCubit.get(context)..getCurrentLocation();
+
     return Scaffold(
       body: Container(
         width: double.infinity,
         child: BlocBuilder<OrderCubit, OrderStates>(
           builder: (context, state) {
             var cubit = OrderCubit.get(context);
-
             return BlocConsumer<ApiAppCubit, ApiStates>(
                 listener: (context, apistate) {},
                 builder: (context, apistate) {
                   var apiCubit = ApiAppCubit.get(context);
-
                   return Column(
                     children: [
                       ConditionalBuilder(
@@ -176,36 +179,35 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   .data!.length !=
                                               0) {
                                             return buildCustomerCard(
-                                                context,
+                                                contextt,
                                                 apiCubit.dropOffData!.response
-                                                    .data![index]);
+                                                    .data![index],
+                                                index,
+                                                true);
                                           } else {
-                                            return Expanded(
-                                              child: Center(
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      getLang(context,
-                                                          "empty_order"),
-                                                      style: TextStyle(
-                                                        fontSize: 17,
-                                                        fontFamily: "SegoeUI",
-                                                        color:
-                                                            Color(0xff0D4B75),
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
+                                            return Center(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    getLang(
+                                                        context, "empty_order"),
+                                                    style: TextStyle(
+                                                      fontSize: 17,
+                                                      fontFamily: "SegoeUI",
+                                                      color: Color(0xff0D4B75),
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
-                                                    SizedBox(
-                                                      child: SvgPicture.asset(
-                                                          "assets/icons/Nodata.svg", //asset location
-                                                          semanticsLabel:
-                                                              'SVG From asset folder.'),
-                                                    )
-                                                  ],
-                                                ),
+                                                  ),
+                                                  SizedBox(
+                                                    child: SvgPicture.asset(
+                                                        "assets/icons/Nodata.svg", //asset location
+                                                        semanticsLabel:
+                                                            'SVG From asset folder.'),
+                                                  )
+                                                ],
                                               ),
                                             );
                                           }
@@ -214,9 +216,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   .data!.length !=
                                               0) {
                                             return buildCustomerCard(
-                                                context,
+                                                contextt,
                                                 apiCubit.pickUpData!.response
-                                                    .data![index]);
+                                                    .data![index],
+                                                index,
+                                                false);
                                           } else {
                                             return Center(
                                               child: Column(

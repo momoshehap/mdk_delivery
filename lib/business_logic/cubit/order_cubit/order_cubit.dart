@@ -1,33 +1,42 @@
 import 'package:MDKDelivery/model/notify_model.dart';
+import 'package:MDKDelivery/utils/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'order_state.dart';
-// import 'package:image_picker/image_picker.dart';
 
 class OrderCubit extends Cubit<OrderStates> {
   OrderCubit() : super(InitOrderState());
   static OrderCubit get(context) => BlocProvider.of(context);
-  static bool isEn = true;
+  static bool isEn = false;
   bool isAr = !isEn;
+  Locale? locale;
 
-  init() async {
-    SharedPreferences userPrefs = await SharedPreferences.getInstance();
-    bool? lang = userPrefs.getBool('isEn');
-    if (lang == null) {
-      isEn = true;
-      isAr = !isEn;
-    } else {
-      isEn = lang;
-      isAr = !isEn;
-    }
+  Future init() async {
+    await SharedPreferences.getInstance().then((value) {
+      bool? lang = value.getBool('isEn');
+      if (lang == null || lang == true) {
+        isEn = true;
+        changeLocale(Locale('en'));
+      } else if (lang == false) {
+        isEn = lang;
+        changeLocale(Locale('ar'));
+      }
+      emit(SetinitFanctionstate());
+      return value;
+    });
   }
 
   void changeLangu(bool lang) {
-    emit(ChangeLanguagestate());
     isEn = lang;
     isAr = !isEn;
+    emit(ChangeLanguagestate());
+  }
+
+  void changeLocale(Locale local) {
+    locale = local;
+    emit(ChangeLogstate());
   }
 
   LocaleResolutionCallback localeResolutionCallback =
@@ -45,7 +54,7 @@ class OrderCubit extends Cubit<OrderStates> {
     emit(ChangeDropoffCustomerstate());
   }
 
-  String dropDownValue = "Picked_Up";
+  String? dropDownValue = "Picked_Up";
   void changeDropDown(value) {
     dropDownValue = value;
     emit(ChangeDropDownstate());

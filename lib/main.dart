@@ -1,4 +1,6 @@
+import 'package:MDKDelivery/business_logic/cubit/api_cubit/api_states.dart';
 import 'package:MDKDelivery/localization/localizatios.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:MDKDelivery/service/api.dart';
 import 'package:MDKDelivery/utils/strings.dart';
@@ -12,18 +14,21 @@ import 'business_logic/cubit/order_cubit/order_state.dart';
 import 'router/app_routes.dart';
 
 late String initialRoute;
-
+late bool isEn;
+bool? langu;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Helper.init();
   SharedPreferences userPrefs = await SharedPreferences.getInstance();
   String? user = userPrefs.getString('userData');
-
+  bool? lang = userPrefs.getBool('isEn');
+  langu = lang;
   if (user == null) {
     initialRoute = loginScreen;
   } else {
     initialRoute = appMainScreen;
   }
+
   runApp(const MyApp());
 }
 
@@ -46,14 +51,13 @@ class _MyAppState extends State<MyApp> {
       providers: [
         BlocProvider(create: (BuildContext cntext) => NavAppCubit(context)),
         BlocProvider(create: (BuildContext context) => OrderCubit()..init()),
-        BlocProvider(create: (BuildContext context) => ApiAppCubit()..init()),
+        BlocProvider(
+          create: (BuildContext context) => ApiAppCubit()..init(),
+        ),
       ],
-      child: BlocConsumer<OrderCubit, OrderStates>(listener: (context, state) {
-        if (state is ChangeLanguagestate) {
-          setState(() {});
-        }
-      }, builder: (context, state) {
+      child: BlocBuilder<OrderCubit, OrderStates>(builder: (context, state) {
         var cubit = OrderCubit.get(context);
+
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'MDK',
@@ -68,6 +72,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
           onGenerateRoute: AppRouter().onGenerateRoute,
+          locale: cubit.locale,
           initialRoute: initialRoute,
           localizationsDelegates: [
             AppLocale.delegate,
@@ -79,7 +84,13 @@ class _MyAppState extends State<MyApp> {
             Locale("en", ""),
             Locale("ar", ""),
           ],
-          localeResolutionCallback: cubit.localeResolutionCallback,
+          localeResolutionCallback: (currentLang, supportedLang) {
+            if (cubit.locale == Locale("en", "")) {
+              return supportedLang.first;
+            } else {
+              return supportedLang.last;
+            }
+          },
         );
       }),
     );

@@ -1,5 +1,6 @@
 import 'package:MDKDelivery/business_logic/cubit/navigation_cubit/home_navigation_cubit.dart';
 import 'package:MDKDelivery/localization/localizatios.dart';
+import 'package:MDKDelivery/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:MDKDelivery/utils/strings.dart';
 
@@ -29,13 +30,31 @@ class _SettingScreen extends State<SettingScreen> {
           children: [
             buildsettingcomponant(
               context,
-              imgname: "language",
+              imgname: "myprofile",
+              title: getLang(context, "profile"),
+              screen: myProfileScreen,
+            ),
+            buildsettingcomponant(
+              context,
+              imgname: "changeLanguage",
               title: getLang(context, "change_language"),
             ),
             buildsettingcomponant(context,
                 imgname: "logout",
                 title: getLang(context, "logout"),
                 screen: loginScreen),
+            const SizedBox(
+              height: 30,
+            ),
+            Text(
+              "V 2.3",
+              style: TextStyle(
+                fontSize: 17,
+                fontFamily: "SegoeUI",
+                color: Color(0xff004067),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),

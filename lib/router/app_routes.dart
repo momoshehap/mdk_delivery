@@ -1,3 +1,4 @@
+import 'package:MDKDelivery/presentation/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:MDKDelivery/presentation/screens/appMain_screen.dart';
 import 'package:MDKDelivery/presentation/screens/customers_screen.dart';
@@ -12,7 +13,7 @@ import '../utils/strings.dart';
 class AppRouter {
   Route? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case '/':
+      case loginScreen:
         return MaterialPageRoute(
           builder: (_) => const LoginScreen(),
         );
@@ -44,10 +45,10 @@ class AppRouter {
           builder: (_) => const SettingScreen(),
         );
 
-      // case orderSucces:
-      //   return MaterialPageRoute(
-      //     builder: (_) => const OrderSucces(),
-      //   );
+      case myProfileScreen:
+        return MaterialPageRoute(
+          builder: (_) => const MyProfileScreen(),
+        );
       default:
         return null;
     }

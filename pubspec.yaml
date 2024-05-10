@@ -39,7 +39,7 @@ dependencies:
   flutter_native_splash: ^2.1.6
   flutter_svg: ^0.22.0
   geolocator: ^8.2.1
-  intl: ^0.17.0
+  intl: ^0.18.0
   shared_preferences: ^2.0.14
   url_launcher: ^6.1.2
 

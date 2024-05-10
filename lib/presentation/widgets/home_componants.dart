@@ -522,8 +522,7 @@ Future<dynamic> buildCustomerDialog(
                                         ),
                                       ),
                                       style: ElevatedButton.styleFrom(
-                                        shape: StadiumBorder(),
-                                        primary: Color(0xff0D4B75),
+                                        shape: StadiumBorder(), backgroundColor: Color(0xff0D4B75),
                                       ),
                                     ),
                                   ),

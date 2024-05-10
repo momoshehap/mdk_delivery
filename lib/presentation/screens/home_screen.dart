@@ -124,11 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ),
                                           style: ElevatedButton.styleFrom(
-                                            elevation: 0,
-                                            shape: StadiumBorder(),
-                                            primary: cubit.isDropoff
+                                            elevation: 0, backgroundColor: cubit.isDropoff
                                                 ? Color(0xff0D4B75)
                                                 : Colors.white,
+                                            shape: StadiumBorder(),
                                           ),
                                         ),
                                       ),
@@ -150,11 +149,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ),
                                           style: ElevatedButton.styleFrom(
-                                            elevation: 0,
-                                            shape: StadiumBorder(),
-                                            primary: !cubit.isDropoff
+                                            elevation: 0, backgroundColor: !cubit.isDropoff
                                                 ? Color(0xff0D4B75)
                                                 : Colors.white,
+                                            shape: StadiumBorder(),
                                           ),
                                         ),
                                       ),
